@@ -1,0 +1,424 @@
+import React, { useState } from 'react';
+import { Menu, X, Shield, Lock, TrendingUp, BarChart3, Camera, Leaf, FileText, ArrowRight, Mic, Headphones, Play, MapPin, Coins, Info, Search, Server } from 'lucide-react';
+
+// ==============================================================================
+// 1. TARTALOM ÉS ADATOK
+// ==============================================================================
+
+const TARTALOM = {
+  header: {
+    title: "Valódi közösségi média.",
+    text_1: "A mai médiatérben algoritmusok és politikai érdekek döntik el, mit látsz a világból. Mi ezt nem fogadjuk el.",
+    text_2: "Összesen több mint száz évnyi közös újságírói tapasztalattal a hátunk mögött régóta azon dolgozunk, hogy ellensúlyozzuk a hatalmi és gazdasági visszaéléseket, és hangot adjunk azoknak, akik ezeknek a kárvallottjai. (Ezen dolgoztunk együtt a Szabad Európán is, amíg el nem hallgattattak)",
+    text_3: "A Közös oldal egy újfajta médiaszolgáltatás, éppen ezért az alapokhoz, a valódi közszolgálathoz tér vissza: mi nem a kattintásokért versenyzünk, hanem azért, hogy objektíven eléd tárjuk azokat a történeteket, amik mellett elmegy a hírverseny.",
+    highlight: "Tényfeltárás, oknyomozás, terepmunka, a vidék és a társadalom peremének valósága – ezt kínáljuk.",
+    text_4: "De a legfontosabb: ez a portál nem a nagy médiacégek vagy politikai pártok érdekeit szolgálja, hanem a Tiédet. Ez egy eszköz arra, hogy eldönthesd, milyen történeteket akarsz látni, hallani és olvasni.",
+    closing: "Ha érdekel egy történet, és segítesz összegyűjteni a forrásokat az elkészítéséhez, mi megírjuk, leforgatjuk, közreadjuk. Ez a függetlenségünk záloga."
+  },
+
+  pilotSection: {
+    title: "Pilot projektek",
+    intro: "Mikroadományaiddal nemcsak a kiemelt projekteket, hanem az oldal fenntartható működését és az Oknyomozó Alapot is támogathatod. Ez az alap teszi lehetővé, hogy olyan kényes ügyeknek is utánajárjunk, amelyekről a nyomozás érdekében előre nem beszélhetünk – a részletes elszámolást a leleplezés után hozzuk nyilvánosságra.",
+    infoTitle: "Miért csak 2000 Ft?",
+    infoText: "A Közös oldal függetlenségének záloga a mikroadomány-modell. Egyetlen támogató sem adhat többet 2000 forintnál egy projektre. Ezzel garantáljuk, hogy senki – még a leggazdagabbak sem – vásárolhatnak befolyást a szerkesztőségben. Mi a sok kicsi erejében hiszünk, nem a nagytőkében."
+  },
+
+  generalSupport: [
+    {
+      id: 'fund',
+      title: "Oknyomozó Alap",
+      subtitle: "Háttérmunka & Kutatás",
+      description: "Ebbe a kalapba projekt nélkül is tehetsz. Ebből fedezzük az előkutatást, cégadatbázisokat és közérdekű adatigényléseket. Nyomon követhető lesz, melyik későbbi sztori mennyit használt fel belőle.",
+      icon: <Search className="w-5 h-5" />,
+      color: "bg-red-800",
+      currentAmount: 1200000,
+      goalAmount: 5000000 
+    },
+    {
+      id: 'site',
+      title: "Működési Támogatás",
+      subtitle: "A portál fenntartása",
+      description: "Támogasd magát az oldalt és a szerkesztőség alapvető működését. Hogy legyen hol megjelennie az igazságnak.",
+      icon: <Server className="w-5 h-5" />,
+      color: "bg-slate-700",
+      currentAmount: 452000, 
+      goalAmount: 2000000 
+    }
+  ],
+
+  authors: [
+    {
+      name: "Barna-Lipkovski Miklós",
+      role: "Videós újságíró, dokumentumfilmes",
+      bio: "A Szabad Európa korábbi videós munkatársa. Tizenhat éve foglalkozik dokumentumfilmezéssel és videós újságírással. Szabadúszóként dolgozott a Radio Cafénak, a Magyar Narancsnak.",
+      image: "https://www.vac.rs/storage/images/general/Miklos.jpg"
+    },
+    {
+      name: "Báthory Róbert",
+      role: "Oknyomozó újságíró",
+      bio: "A Szabad Európa korábbi szenior munkatársa. Tizenhét éve dolgozik a médiában, ebből tíz évet a legnagyobb televíziók hírműsorainál töltött.",
+      image: "https://gdb.rferl.org/bb7336aa-f42c-4436-83e4-2ab7491fee36_cx9_cy0_cw86_w144_r5.jpg"
+    },
+    {
+      name: "Fazekas Pálma",
+      role: "Hírszerkesztő",
+      bio: "A Szabad Európa korábbi hírszerkesztője. Csaknem harminc éve dolgozik újságíróként a nyomtatott és az elektronikus sajtó szinte minden területén.",
+      image: "https://gdb.rferl.org/7330b645-b02b-42fc-af41-2e7fe787e485_cx11_cy2_cw79_w144_r5.jpg"
+    },
+    {
+      name: "Horn Gabriella",
+      role: "Oknyomozó újságíró",
+      bio: "Több mint húsz éve újságíró. A Szabad Európa korábbi rovatvezetője, az atlatszo.hu alapítója. Hégető Honorka-díjas és Soma-díjas újságíró.",
+      image: "https://gdb.rferl.org/09850000-0aff-0242-c574-08da9fc567ab_cx14_cy0_cw74_w144_r5.jpg"
+    },
+    {
+      name: "Kósa András",
+      role: "Újságíró, szerkesztő",
+      bio: "A Szabad Európa korábbi főmunkatársa. 2001 óta újságíró. Dolgozott a Magyar Hírlapnál, Magyar Nemzetnél, Hír TV-nél, a HVG-nél és az Azonnalinál.",
+      image: "https://hang.hu/data/generated/articles/132/1324/article-132454/KosaAndras_focuspointscale_w856_fx0_fy0.webp?key=ZjEyMzU5MmVjM2UyZDY1YWEzYmM0YmIyMDZiODg1NWE3MjI0ODFjNWY3NGFlOTA1YTZkMDM0M2UwMjBlMjAyZg==&v=1765884566"
+    }
+  ],
+
+  stories: [
+    {
+      id: 5,
+      authors: "Közös oldal Oknyomozó Csoport",
+      title: "CÍM NÉLKÜL: Kelet-magyarországi tényfeltárás",
+      type: "kiemelt nyomozás",
+      excerpt: "Folyamatban lévő nyomozás. A részleteket a forrásvédelem miatt nem közöljük. A támogatás az utazási és jogi költségeket fedezi.",
+      currentAmount: 1250000, 
+      goalAmount: 4000000,    
+      image: "https://static-cdn.hungaricana.hu/tile/thumb/maps/megyei/szabolcs/szszbml_t_316/szszbml_t_316.ecw/",
+      color: "bg-slate-800",
+      icon: <Shield className="w-4 h-4" />
+    },
+    {
+      id: 1,
+      authors: "Horn Gabriella & Barna-Lipkovski Miklós",
+      title: "A felcsúti birodalom határai",
+      type: "videoriport",
+      excerpt: "Helyszíni riport a miniszterelnök szülőföldjéről. Eddig be nem mutatott történetek és összefüggések.",
+      currentAmount: 850000,
+      goalAmount: 1200000,
+      image: "https://upload.wikimedia.org/wikipedia/commons/3/39/Felcs%C3%BAt_l%C3%A9gi_fot%C3%B3.jpg",
+      color: "bg-blue-600",
+      icon: <Camera className="w-4 h-4" />
+    },
+    {
+      id: 2,
+      authors: "Kósa András",
+      title: "Balatongyörök: Kastélyból luxuslakópark?",
+      type: "oknyomozás",
+      excerpt: "Balatongyörökön 242 millió forintért, vagyis 73 ezer forintos négyzetméter áron vette meg egy vállalkozás a település központjában álló kastély-üdülőt. Luxuslakóparkot terveznek a helyére.",
+      currentAmount: 1850000,
+      goalAmount: 2000000,
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Balatongy%C3%B6r%C3%B6k-_Hungary.jpg/250px-Balatongy%C3%B6r%C3%B6k-_Hungary.jpg",
+      color: "bg-red-600",
+      icon: <FileText className="w-4 h-4" />
+    }
+  ],
+
+  podcasts: [
+    {
+      id: 6,
+      authors: "Fazekas Pálma",
+      title: "SZTORIBAN: Műhelytitkok",
+      type: "háttér podcast",
+      excerpt: "Újságírói háttérműsor. Hogyan készülnek a tényfeltáró anyagok? Mit mondanak a források kamerán kívül?",
+      currentAmount: 450000,
+      goalAmount: 1200000,
+      image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=1000",
+      color: "bg-purple-700",
+      icon: <Mic className="w-4 h-4" />
+    },
+    {
+      id: 7,
+      authors: "Közös oldal Szerkesztőség",
+      title: "Közösségi Híradó",
+      type: "napi hírek",
+      excerpt: "Objektív napi hírösszefoglaló podcast.",
+      currentAmount: 150000,
+      goalAmount: 600000,
+      image: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=1000",
+      color: "bg-teal-700",
+      icon: <Headphones className="w-4 h-4" />
+    }
+  ]
+};
+
+// ==============================================================================
+// 2. LOGIKA ÉS MEGJELENÍTÉS
+// ==============================================================================
+
+const App = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // ITT JAVÍTOTTAM A HIBÁT: BIZTOSRA MEGYÜNK, HOGY MINDEN TÖMB LÉTEZIK
+  const initialProjects = [
+    ...(TARTALOM.stories || []), 
+    ...(TARTALOM.podcasts || []), 
+    ...(TARTALOM.generalSupport || [])
+  ];
+
+  const [allProjects, setAllProjects] = useState(initialProjects);
+
+  const handleFund = (id) => {
+    setAllProjects(allProjects.map(project => {
+      if (project.id === id) {
+        return { 
+          ...project, 
+          currentAmount: project.currentAmount + 2000
+        };
+      }
+      return project;
+    }));
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'HUF', maximumFractionDigits: 0 }).format(amount);
+  };
+
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('hu-HU').format(num);
+  };
+
+  const renderCard = (item) => {
+    const percent = Math.min((item.currentAmount / item.goalAmount) * 100, 100);
+    const supportersNeeded = Math.ceil(item.goalAmount / 2000);
+    const supportersCurrent = Math.floor(item.currentAmount / 2000);
+
+    return (
+      <div key={item.id} className="group bg-white rounded-none overflow-hidden shadow-sm hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] transition-all duration-200 flex flex-col h-full border border-slate-200">
+        <div className="relative h-56 overflow-hidden border-b border-slate-200">
+          {item.image ? (
+            <img 
+              src={item.image} 
+              alt={item.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale group-hover:grayscale-0"
+            />
+          ) : (
+            <div className={`w-full h-full ${item.color} flex items-center justify-center`}>
+               {React.cloneElement(item.icon, { size: 64, className: "text-white opacity-20" })}
+            </div>
+          )}
+          
+          <div className={`absolute top-0 left-0 ${item.color} text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2`}>
+            {item.icon} {item.subtitle || item.type || "Támogatás"}
+          </div>
+        </div>
+
+        <div className="p-6 flex-grow flex flex-col">
+          <h3 className="text-xl font-serif font-bold text-slate-900 mb-2 leading-tight group-hover:text-red-700 transition-colors">
+            {item.title}
+          </h3>
+          {item.authors && (
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+              {item.authors}
+            </div>
+          )}
+          <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-4 flex-grow">
+            {item.description || item.excerpt}
+          </p>
+
+          <div className="mt-auto pt-4 border-t border-slate-100">
+            <div className="flex justify-between items-end mb-2">
+              <div className="text-xs text-slate-500 uppercase tracking-wider font-bold">
+                Támogatottság
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-slate-900">{Math.round(percent)}%</div>
+              </div>
+            </div>
+            
+            <div className="w-full bg-slate-200 h-1.5 mb-4">
+              <div 
+                className={`h-full ${item.color}`} 
+                style={{ width: `${percent}%` }}
+              ></div>
+            </div>
+
+            <div className="bg-slate-50 p-3 mb-4 border border-slate-100 text-xs text-slate-600 space-y-1">
+                <div className="flex justify-between">
+                  <span>Szükséges:</span>
+                  <span className="font-bold">{formatNumber(supportersNeeded)} db × 2000 Ft</span>
+                </div>
+                <div className="flex justify-between text-slate-400">
+                  <span>Teljesítve:</span>
+                  <span>{formatNumber(supportersCurrent)} db</span>
+                </div>
+            </div>
+
+            <button 
+              onClick={() => handleFund(item.id)}
+              className="w-full bg-slate-900 text-white py-3 rounded-none font-bold text-xs uppercase tracking-widest hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <Coins size={14} />
+              Támogatom (2000 Ft)
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-100 font-sans text-slate-900 selection:bg-red-100 selection:text-red-900">
+      
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-slate-100/95 backdrop-blur border-b border-slate-300 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20 items-center">
+            <div className="flex items-center gap-3 group cursor-pointer">
+              <div className="bg-slate-900 text-white px-4 py-2 font-serif font-black text-2xl tracking-tighter group-hover:bg-red-700 transition-colors uppercase">
+                Közös oldal
+              </div>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-8 font-bold text-xs uppercase tracking-widest text-slate-600">
+              <a href="#" className="hover:text-red-700 transition-colors">Projektek</a>
+              <a href="#" className="hover:text-red-700 transition-colors">Támogatás</a>
+              <a href="#" className="hover:text-red-700 transition-colors">Munkatársak</a>
+              <button className="bg-red-700 text-white px-6 py-2.5 rounded-none font-bold hover:bg-slate-900 transition-all shadow-sm hover:shadow-md">
+                Belépés
+              </button>
+            </div>
+
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-slate-600">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* MANIFESTO */}
+      <header className="relative bg-slate-900 text-slate-100">
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-24 text-center">
+          <div className="inline-block mb-6 border border-slate-600 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+            Független • Közösségi • Tényfeltáró
+          </div>
+
+          <h1 className="font-serif text-4xl md:text-6xl font-bold mb-8 leading-tight tracking-tight text-white">
+            {TARTALOM.header.title}
+          </h1>
+          
+          <div className="text-left text-slate-300 max-w-4xl mx-auto space-y-4 leading-relaxed text-base md:text-lg font-light">
+            <p className="font-medium text-white">
+              {TARTALOM.header.text_1}
+            </p>
+            <p>{TARTALOM.header.text_2}</p>
+            <p>{TARTALOM.header.text_3}</p>
+            <p className="pl-4 border-l-2 border-red-700 text-slate-400 italic">
+              {TARTALOM.header.highlight}
+            </p>
+            <p>{TARTALOM.header.text_4}</p>
+            <p className="font-medium text-white border-t border-slate-800 pt-4 mt-6">
+              {TARTALOM.header.closing}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN CONTENT SECTION */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header with Info */}
+        <div className="flex flex-col items-start mb-12 px-2">
+          <h2 className="text-3xl font-serif font-bold text-slate-900 uppercase tracking-wide border-b-4 border-slate-900 inline-block pb-1">{TARTALOM.pilotSection.title}</h2>
+          
+          <p className="text-slate-600 mt-4 mb-6 max-w-3xl leading-relaxed text-lg">
+            {TARTALOM.pilotSection.intro}
+          </p>
+
+          <div className="mt-2 flex flex-col sm:flex-row items-start gap-4 bg-white border border-slate-200 p-5 shadow-sm">
+            <div className="px-4 py-2 bg-red-600 text-white rounded-none text-xs font-bold uppercase tracking-widest shadow-sm flex-shrink-0">
+                <Coins size={12} className="inline mr-2 -mt-0.5" /> Max 2000 Ft
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                  <Info className="text-red-600" size={18} />
+                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">{TARTALOM.pilotSection.infoTitle}</h4>
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {TARTALOM.pilotSection.infoText}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 1. STORIES (Pilot projektek) */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {allProjects.filter(p => !p.subtitle && !p.type?.includes('podcast') && !p.type?.includes('hírek')).map(renderCard)}
+        </div>
+
+        {/* 2. PODCASTS & GENERAL SUPPORT (Vegyesen, de vizuálisan egységesen) */}
+        <div className="mb-8 px-2 border-t border-slate-300 pt-12">
+            <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest mb-8">További támogatási lehetőségek</h3>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+           {/* Először a podcastok */}
+           {allProjects.filter(p => p.type?.includes('podcast') || p.type?.includes('hírek')).map(renderCard)}
+           {/* Utána a működési támogatás */}
+           {allProjects.filter(p => p.subtitle).map(renderCard)}
+        </div>
+
+      </section>
+
+      {/* AUTHORS SECTION */}
+      <section className="bg-slate-200 py-16 border-t border-slate-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-serif font-bold text-slate-900 uppercase tracking-widest">
+              Munkatársak
+            </h2>
+            <div className="w-12 h-1 bg-slate-900 mx-auto mt-4"></div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+            {TARTALOM.authors.map((author, index) => (
+              <div key={index} className="flex flex-col items-center text-center">
+                <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-slate-300 group-hover:border-slate-400 transition-colors">
+                  <img 
+                    src={author.image} 
+                    alt={author.name}
+                    className="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
+                  />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-1">{author.name}</h3>
+                <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider mb-2 block">{author.role}</span>
+                <p className="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+                  {author.bio}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-slate-900 text-slate-500 py-12 border-t border-black">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-3 gap-8 text-sm mb-8">
+                <div>
+                   <h4 className="text-white font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><Shield size={16}/> Függetlenség</h4>
+                   <p>A mikroadományok garantálják, hogy csak az olvasóknak tartozunk elszámolással.</p>
+                </div>
+                <div>
+                   <h4 className="text-white font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><Lock size={16}/> Reklámmentesség</h4>
+                   <p>Nincs állami hirdetés, nincs céges befolyás. Tiszta forrás.</p>
+                </div>
+                <div>
+                   <h4 className="text-white font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><TrendingUp size={16}/> Transzparencia</h4>
+                   <p>Nyilvános számlálók minden projektnél. Átlátható működés.</p>
+                </div>
+            </div>
+            <div className="text-center text-[10px] uppercase tracking-widest pt-8 border-t border-slate-800">
+                <p>&copy; 2024 Közös oldal Média Alapítvány.</p>
+            </div>
+         </div>
+      </footer>
+
+    </div>
+  );
+};
+
+export default App;
